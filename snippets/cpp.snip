@@ -1,0 +1,82 @@
+#### NaokiS Initializer for programming contest
+snippet NSKyoproInit
+abbr    NaokiSKyoproInitializer
+options head
+    //Last Change: 05/18/2019 03:39:22.
+    #include <algorithm>
+    #include <array>
+    #include <bitset>
+    #include <cmath>
+    #include <cstdlib>
+    #include <functional>
+    #include <iomanip>
+    #include <iostream>
+    #include <list>
+    #include <map>
+    #include <memory>
+    #include <numeric>
+    #include <set>
+    #include <stack>
+    #include <string>
+    #include <vector>
+    #include <queue>
+
+    using namespace std;
+    using ll = long long;
+
+    int main() {
+      ${1:}
+    }
+
+#### NaokiS macro
+snippet REP
+abbr NaokiSRepeater
+    for (${1:int} ${2:i} = 0; $2 < ${3:sniperror}; ++$2){
+      ${4}
+    }
+
+snippet REPR
+abbr NaokiSRepDecrease
+    for (${1:int} ${2:i} = ${3:sniperror}; $2 >= 0; --$2){
+      ${4}
+    }
+
+snippet FOR
+abbr NaokiSFor
+    for (${1:int} ${2:i} = ${3:sniperror}; $2 < ${4:sniperror}; ++$2){
+      ${5}
+    }
+
+snippet FORR
+abbr NaokiSForDecrease
+    for (${1:int} ${2:i} = ${3:sniperror}; $2 >= ${4:sniperror}; --$2){
+      ${5}
+    }
+
+snippet RBF
+abbr NaokiSRangeBasedFor
+    for (auto &&${1:e} : ${2:sniperror}){
+      ${3}
+    }
+
+snippet GCD
+abbr NaokiSGCD
+    ${1:ll} gcd($1 a, $1 b){
+      if (a == 0 and b == 0)
+        return 0;
+      a = abs(a);
+      b = abs(b);
+      if (b == 0)
+        return a;
+      else
+        return gcd(b, a % b);
+    }
+
+snippet LCM
+abbr NaokiSGCD
+    ${1:ll} lcm($1 a, $1 b){
+      a = abs(a);
+      b = abs(b);
+      $1 g = gcd(a, b);
+      return (a / g) * b;
+    }

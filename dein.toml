@@ -1,0 +1,340 @@
+# dein.toml
+
+# Darkpowered Plugins
+# asyncronized plugins
+[[plugins]]
+repo = 'Shougo/vimproc.vim'
+hook_post_update = '''
+    if has("win64")
+        let cmd = 'tools\\update-dll-mingw'
+    elseif has("win32unix")
+        let cmd = 'make -f make_cygwin.mak'
+    elseif has("win32")
+        let cmd = 'tools\\update-dll-mingw'
+    "ちょっと適当かも。動く気がしない。
+    elseif has("mac")
+        let cmd = 'make'
+    elseif has("unix")
+        let cmd = 'make'
+    endif
+'''
+
+[[plugins]]
+repo = 'Shougo/denite.nvim'
+hook_add = '''
+    "shortcut for denite start up
+    nnoremap [denite] <Nop>
+    nnoremap [deniteProject] <Nop>
+    nnoremap [deniteCursorWord] <Nop>
+    nmap <Space> [denite]
+    nmap [denite]p [deniteProject]
+    nmap [denite]c [deniteCursorWord]
+
+    " 以下はdenite起動に使用するキーマップ
+    "-highlight-mode-insert=Search によってカーソルラインの色変更が可能
+    "-winheight=`60*winheight(0)/100` によってDeniteのウィンドウを全体の40%に固定
+
+    "バッファ一覧 -buffer-name=fileは必要？
+    "カレントディレクトリ検索
+    "任意のディレクトリ検索
+    "最近使用したファイルから
+    "ファイル一覧（検索）
+    nnoremap <silent> [denite]b :Denite -highlight-mode-insert=Search buffer<CR>
+    nnoremap <silent> [denite]fc :Denite -highlight-mode-insert=Search file/rec<CR>
+    nnoremap <silent> [denite]fa :Denite file/rec -highlight-mode-insert=Search -path=
+    nnoremap <silent> [denite]old :Denite -highlight-mode-insert=Search file/old<CR>
+    nnoremap <silent> [denite]F :Denite -buffer-name=file -highlight-mode-insert=Search file<CR>
+
+    "-- 現在開いているバッファのディレクトリをターゲットにする --
+    noremap <silent> [denite]B :DeniteBufferDir -highlight-mode-insert=Search file/rec<CR>
+
+    "バッファー内を行で絞り込む
+    "grep(ファイル内検索)
+    "ファイル内の関数/クラス等の検索
+    nnoremap <silent> [denite]l :Denite line<CR>
+    nnoremap <silent> [denite]g :Denite -highlight-mode-insert=Search grep<CR>
+    nnoremap <silent> [denite]out :Denite -highlight-mode-insert=Search outline<CR>
+
+    "-- カーソルのある単語を検索 --
+    nnoremap <silent> [deniteCursorWord]f :DeniteCursorWord -highlight-mode-insert=Search file/rec<CR>
+    nnoremap <silent> [deniteCursorWord]b :DeniteCursorWord -highlight-mode-insert=Search buffer<CR>
+
+    "前回のDeniteバッファを再表示する
+    nnoremap <silent> [denite]r :Denite -resume<CR>
+    "?nnoremap <silent> [denite]c :Denite changes<CR>
+    "nnoremap <silent> [denite]h :Denite help<CR>
+    "nnoremap <silent> [denite]t :Denite tag<CR>
+
+    "-- プロジェクトのルートディレクトリと思われる場所をターゲットにする --
+    nnoremap <silent> [deniteProject]b :DeniteProject -highlight-mode-insert=Search buffer<CR>
+    nnoremap <silent> [deniteProject]g :DeniteProject -highlight-mode-insert=Search grep<CR>
+    nnoremap <silent> [deniteProject]f :DeniteProject -highlight-mode-insert=Search file/rec<CR>
+
+    "以下はwindows非対応
+    if g:ostype != "win" && g:ostype != "win_x86"
+        nnoremap <silent> [deniteProject]d :DeniteProject -highlight-mode-insert=Search directory_rec<CR>
+        nnoremap <silent> [denite]d :Denite -highlight-mode-insert=Search directory_rec<CR>
+    endif
+
+    "Denite起動後に使用する
+    function! MyDeniteSettingFunc()
+      if executable('rg')
+        call denite#custom#var('file_rec', 'command',
+            \ ['rg', '--files', '--glob', '!.git'])
+        "'--threads','1'はいらない？
+        call denite#custom#var('grep', 'command', ['rg', '--threads', '1'])
+        "この下もいらない？
+        call denite#custom#var('grep', 'recursive_opts', [])
+        call denite#custom#var('grep', 'final_opts', [])
+        call denite#custom#var('grep', 'separator', ['--'])
+        call denite#custom#var('grep', 'default_opts',
+            \ ['--vimgrep', '--no-heading'])
+      endif
+
+      " file_rec検索時にfuzzymatch(曖昧検索)を有効にし、検索対象から指定のファイルを除外
+      call denite#custom#source(
+            \ 'file_rec', 'matchers', ['matcher_fuzzy', 'matcher_project_files', 'matcher_ignore_globs'])
+      "検索の除外対象を登録
+      call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
+              \ ['.git/', 'build/', '__pycache__/',
+              \ 'images/', '*.min.*', 'img/', 'fonts/'])
+
+      "--all mode-- 873行目参照 ムリだった
+      "call denite#custom#map('_','<C-e>',
+      "        \ '<denite:quit>','noremap')
+
+      call denite#custom#map('normal','<C-e>',
+              \ '<denite:quit>','noremap')
+      call denite#custom#map('insert','<C-e>',
+              \ '<denite:quit>','noremap')
+      "call denite#custom#map('normal','<Space>',
+      "        \ '<Nop>','noremap')
+      "call denite#custom#map('normal','<Space><Space>',
+      "        \ '<denite:toggle_select>','noremap')
+
+      "--insert mode--
+      " denite/insert モードのとき，UpDownで移動できるようにする
+      call denite#custom#map('insert', '<Down>',
+              \ '<denite:move_to_next_line>')
+      call denite#custom#map('insert', '<Up>',
+              \ '<denite:move_to_previous_line>')
+      " 上でつぶれた「過去の履歴 」はRightLeftで
+      "call denite#custom#map('insert', '<Right>', '<denite:assign_next_matched_text>')
+      "call denite#custom#map('insert', '<Left>', '<denite:assign_previous_matched_text>')
+      "Escをノーマルモードへの切り替えに
+      call denite#custom#map('insert','<Esc>',
+              \ '<denite:enter_mode:normal>','noremap')
+    endfunction
+
+    augroup my_denite_setting
+        autocmd!
+        autocmd VimEnter * nested call MyDeniteSettingFunc()
+    augroup END
+
+''' 
+
+#defx--Darkpowered filer
+[[plugins]]
+repo = 'Shougo/defx.nvim'
+hook_add = '''
+    nnoremap <Space>fx :Defx<CR>
+    autocmd FileType defx call s:defx_my_settings()
+    function! s:defx_my_settings() abort
+        " Define mappings
+        nnoremap <silent><buffer><expr> <CR>
+        \ defx#do_action('open')
+        nnoremap <silent><buffer><expr> c
+        \ defx#do_action('copy')
+        nnoremap <silent><buffer><expr> m
+        \ defx#do_action('move')
+        nnoremap <silent><buffer><expr> p
+        \ defx#do_action('paste')
+        nnoremap <silent><buffer><expr> l
+        \ defx#do_action('open')
+        "nnoremap <silent><buffer><expr> E
+        "\ defx#do_action('open', 'vsplit')
+        nnoremap <silent><buffer><expr> <C-CR>
+        \ defx#do_action('open', 'vsplit')
+        nnoremap <silent><buffer><expr> <C-l>
+        \ defx#do_action('open', 'vsplit')
+       nnoremap <silent><buffer><expr> P
+        \ defx#do_action('open', 'pedit')
+        nnoremap <silent><buffer><expr> K
+        \ defx#do_action('new_directory')
+        nnoremap <silent><buffer><expr> N
+        \ defx#do_action('new_file')
+        nnoremap <silent><buffer><expr> Dl
+        \ defx#do_action('remove')
+        nnoremap <silent><buffer><expr> r
+        \ defx#do_action('rename')
+        nnoremap <silent><buffer><expr> x
+        \ defx#do_action('execute_system')
+        nnoremap <silent><buffer><expr> yy
+        \ defx#do_action('yank_path')
+        nnoremap <silent><buffer><expr> .
+        \ defx#do_action('toggle_ignored_files')
+        nnoremap <buffer><expr> h
+        \ defx#do_action('cd', ['..'])
+        nnoremap <buffer><expr> <BS>
+        \ defx#do_action('cd', ['..'])
+        nnoremap <buffer><expr> ~
+        \ defx#do_action('cd')
+        nnoremap <silent><buffer><expr> <C-e>
+        \ defx#do_action('quit')
+        nnoremap <silent><buffer><expr> <Space><Space>
+        \ defx#do_action('toggle_select')
+        nnoremap <silent><buffer><expr> *
+        \ defx#do_action('toggle_select_all')
+        nnoremap <silent><buffer><expr> j
+        \ line('.') == line('$') ? 'gg' : 'j'
+        nnoremap <silent><buffer><expr> k
+        \ line('.') == 1 ? 'G' : 'k'
+        nnoremap <silent><buffer><expr> <C-l>
+        \ defx#do_action('redraw')
+        nnoremap <silent><buffer><expr> <C-g>
+        \ defx#do_action('print')
+        nnoremap <buffer><expr> cd
+        \ defx#do_action('change_vim_cwd')
+    endfunction
+'''
+
+# deoplete
+[[plugins]]
+repo = 'Shougo/deoplete.nvim'
+hook_add = '''
+    " <TAB>: completion.
+    inoremap <silent><expr> <TAB>
+        \ <SID>Check_Back_Space() ? "\<TAB>" :
+        \ pumvisible() ? "\<C-n>" :
+        \ neosnippet#expandable_or_jumpable() ?
+        \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+"\ deoplete#manual_complete() : "\<TAB>"
+
+    function! s:Check_Back_Space() abort
+        let s:col = col('.') - 1
+        return s:col<1 || getline('.')[s:col - 1]  =~ '\s'
+    endfunction
+
+    " <S-TAB>: completion back.
+    inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : ""
+    " <C-e>: popup cancel
+    inoremap <expr><C-e> deoplete#cancel_popup()
+
+    " Use deoplete
+    let g:deoplete#enable_at_startup = 1
+    let g:deoplete#auto_complete_delay = 0
+    let g:deoplete#auto_complete_start_length = 1
+    let g:deoplete#enable_camel_case = 0
+    let g:deoplete#enable_ignore_case = 0
+    let g:deoplete#enable_refresh_always = 0
+    let g:deoplete#enable_smart_case = 1
+    let g:deoplete#file#enable_buffer_path = 1
+    let g:deoplete#max_list = 10000
+    "set completeopt-=preview
+    " autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+'''
+
+
+#autodate
+[[plugins]]
+repo = 'vim-scripts/autodate.vim'
+hook_add = """
+    let g:autodate_format="%m/%d/%Y %H:%M:%S"
+"""
+
+#mark indents
+[[plugins]]
+repo = 'nathanaelkane/vim-indent-guides'
+hook_add = '''
+    let g:indent_guides_enable_on_vim_startup = 1
+    let g:indent_guides_exclude_filetypes = ['help', 'nerdtree']
+    let g:indent_guides_guide_size = 1
+    let g:indent_guides_start_level = 2
+'''
+
+#multi color highlight
+[[plugins]]
+repo = 't9md/vim-quickhl'
+hook_add = '''
+    nmap <Space>h <Plug>(quickhl-manual-this)
+    xmap <Space>h <Plug>(quickhl-manual-this)
+    nmap <Space>H <Plug>(quickhl-manual-reset)
+    xmap <Space>H <Plug>(quickhl-manual-reset)
+    "Highlights' colors
+    " カーソルに追従するハイライト色
+    let g:quickhl_cword_hl_command = [
+        \ "gui=none ctermfg=7   ctermbg=153 guibg=#4169e1 guifg=#ffffff",
+        \ "gui=none ctermfg=7   ctermbg=1   guibg=#70a040 guifg=#ffffff",
+        \ "gui=none ctermfg=7   ctermbg=2   guibg=#ffa500 guifg=#ffffff",
+        \ "gui=none ctermfg=7   ctermbg=3   guibg=#cd4040 guifg=#ffffff",
+        \ "gui=none ctermfg=7   ctermbg=4   guibg=#20b2aa guifg=#ffffff",
+        \ "gui=none ctermfg=7   ctermbg=5   guibg=#6a5acd guifg=#ffffff",
+        \ "gui=none ctermfg=7   ctermbg=6   guibg=#f08080 guifg=#ffffff",
+        \ "gui=none ctermfg=7   ctermbg=45  guibg=#1060a0 guifg=#ffffff",
+        \ "gui=none ctermfg=7   ctermbg=16  guibg=#2e8b57 guifg=#ffffff",
+        \ "gui=none ctermfg=7   ctermbg=21  guibg=#a9a9a9 guifg=#ffffff",
+        \ "gui=none ctermfg=7   ctermbg=22  guibg=#e0c67c guifg=#ffffff",
+        \ "gui=none ctermfg=7   ctermbg=56  guibg=#dd0add guifg=#ffffff",
+        \ "gui=none ctermfg=16  ctermbg=50  guibg=#00ffff guifg=#222222",
+    \ ]
+'''
+
+#expand the status var
+[[plugins]]
+repo = 'itchyny/lightline.vim'
+hook_add = """
+    set laststatus=2
+    "hide --INSERT--
+    set noshowmode
+    let g:lightline = {
+        \ 'colorscheme': 'wombat',
+        \ 'active'     : {
+        \ 'left':[['mode','paste'], ['readonly', 'filename', 'modified'] ],
+        \ 'right':[['lineinfo'],['percent'],['fileformat','fileencoding','filetype']]
+        \},
+        \ 'component_function': {
+        \   'mode': 'LightlineMode'
+        \ }
+    \}
+    function! LightlineMode()
+        return  &ft == 'denite' ? 'Denite' :
+            \ &ft == 'vimfiler' ? 'VimFiler' :
+            \ &ft == 'dein' ? 'Dein' :
+            \ winwidth(0) > 60 ? lightline#mode() : ''
+    endfunction
+"""
+
+#syntax_checker
+[[plugins]]
+repo = 'w0rp/ale'
+hook_add = """
+    "ファイル保存時にチェック
+    let g:ale_lint_on_save = 1
+    "テキスト変更のたびにチェックするのを防ぐ
+    let g:ale_lint_on_text_changed = 'never'
+    "テキストを開いたときにチェックするのを防ぐ
+    let g:ale_lint_on_enter = 1
+    "左端のシンボルカラムを表示したままにする
+    let g:ale_sign_column_always = 1
+    "choose the Linter adjust to ft
+    let g:ale_linters = {
+        \ 'c' : ['clang'],
+        \ 'cpp' : ['clang'],
+        \ 'javascript': ['eslint'],
+    \}
+    let g:ale_cpp_clang_options = '-Wall -Wextra'
+    " 保存時に整形しない
+    let g:ale_fix_on_save = 0
+    " 補完しない
+    let g:ale_completion_enabled = 0
+    "ハイライトを無効にする
+    "highlight clear ALEErrorSign
+    "highlight clear ALEWarningSign
+    " エラー行に表示するマークを変更可能
+    " エラー行にカーソルをあわせた際に表示されるメッセージフォーマット
+    let g:ale_echo_msg_error_str = 'E'
+    let g:ale_echo_msg_warning_str = 'W'
+    let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+    "let g:ale_statusline_format = ['エラー%d', '警告%d', 'ok']
+    "エラー間の移動を簡単にすることも可能
+"""

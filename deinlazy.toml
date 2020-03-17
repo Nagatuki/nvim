@@ -1,0 +1,110 @@
+# deinlazy.toml
+
+# deoplete-jedi
+[[plugins]]
+repo = 'zchee/deoplete-jedi'
+depends = "deoplete.nvim"
+on_event = 'InsertEnter'
+on_ft = 'python'
+
+# deoplete-clang
+[[plugins]]
+repo = "zchee/deoplete-clang"
+on_ft = ['c', 'cpp', 'cmake']
+depends = "deoplete.nvim"
+hook_source = """
+    if g:ostype=="win"
+        if expand('~/')=='C:\Users\naoki\'
+            let g:deoplete#sources#clang#libclang_path='C:\ProLang\LLVM\lib\libclang.lib'
+            let g:deoplete#sources#clang#clang_header='C:\ProLang\LLVM\lib\clang'
+        else
+            let g:deoplete#sources#clang#libclang_path='D:\Programs\LLVM\lib\libclang.lib'
+            let g:deoplete#sources#clang#clang_header='D:\Programs\LLVM\lib\clang'
+        endif
+    elseif g:ostype=="unix"
+        let g:deoplete#sources#clang#libclang_path='/usr/lib/llvm-6.0/lib/libclang.so.1'
+        let g:deoplete#snippets#clang#clang_header='/usr/lib/llvm-6.0/lib/clang/'
+    endif
+    let g:deoplete#sources#clang#std={'c': 'c11', 'cpp': 'c++1z', 'objc': 'c11', 'objcpp': 'c++1z'}
+"""
+
+# snippets
+[[plugins]]
+repo = 'Shougo/neosnippet-snippets'
+
+# neosnippet本体
+[[plugins]]
+repo = 'Shougo/neosnippet.vim'
+on_ft = ['snippet']
+on_event = 'InsertEnter'
+depends = ['neosnippet-snippets']
+hook_source = '''
+    if g:ostype == 'win'
+        let g:neosnippet#snippets_directory = g:dein_dir . '\repos\github.com\Shougo\neosnippet-snippets\,~\AppData\Local\nvim\snippets'
+    elseif g:ostype == 'unix'
+        let g:neosnippet#snippets_directory = g:dein_dir . '/repos/github.com/Shougo/neosnippet-snippets/,$XDG_CONFIG_HOME/nvim/snippets'
+    endif
+
+    "Ctrl+Kにターゲットジャンプ割当
+    imap <C-k> <Plug>(neosnippet_expand_or_jump)
+    smap <C-k> <Plug>(neosnippet_expand_or_jump)
+    xmap <C-k> <Plug>(neosnippet_expand_target)
+
+    "候補選択中∧スニペットの時、ENTERで選択
+    imap <expr><CR>
+        \ (pumvisible() && neosnippet#expandable()) ?
+        \ "\<Plug>(neosnippet_expand)" : "\<CR>"
+
+    "deopleteでやっている設定をこちらでも設定?
+    imap <expr><TAB>
+        \ pumvisible() ? "\<C-n>" :
+        \ neosnippet#expandable_or_jumpable() ?
+        \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+
+    smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+        \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+
+    "if has('conceal')
+    "  set conceallevel=2 concealcursor=niv
+    "endif
+'''
+
+
+#書式を統一してくれるt 
+[[plugins]]
+repo = "rhysd/vim-clang-format"
+on_ft = "cpp"
+on_event = 'InsertEnter'
+hook_source= """
+    let l:lines='all'
+    let g:clang_format#code_style = "llvm"
+    let g:clang_format#style_options = {
+        \ "AccessModifierOffset" : -2,
+        \ "AlignConsecutiveAssignments" : "false",
+        \ "AlignEscapedNewlinesLeft" : "true",
+        \ "AllowShortFunctionsOnASingleLine" : "None",
+        \ "AllowShortIfStatementsOnASingleLine" : "false",
+        \ "AllowShortLoopsOnASingleLine" : "false",
+        \ "BreakBeforeBinaryOperators" : "NonAssignment",
+        \ "Cpp11BracedListStyle" : "true",
+        \ "DerivePointerAlignment" : "true",
+        \ "PointerAlignment" : "Right",
+        \ "IndentCaseLabels" : "true",
+        \ "IndentWidth" : 2,
+        \ "KeepEmptyLinesAtTheStartOfBlocks" : "true",
+        \ "TabWidth" : 2,
+        \ "UseTab" : "Never"}
+    let g:clang_format#auto_format = 1
+"""
+
+#pythonの書式統一
+[[plugins]]
+repo = 'Vimjas/vim-python-pep8-indent'
+on_ft = 'python'
+
+
+#括弧を補完
+[[plugins]]
+repo = 'cohama/lexima.vim'
+on_event = 'InsertEnter'
+on_ft = ['c','cpp','python']
