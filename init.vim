@@ -12,19 +12,19 @@ if !exists("$XDG_CONFIG_HOME")
 endif
 
 "共通処理
-source $XDG_CONFIG_HOME/nvim/common.vim
+source $XDG_CONFIG_HOME/nvim/setting/common.vim
 
 "OS依存処理
 if has("win64")
-    source $XDG_CONFIG_HOME/nvim/windows.vim
+    source $XDG_CONFIG_HOME/nvim/setting/windows.vim
 elseif has("unix")
-    source $XDG_CONFIG_HOME/nvim/unix.vim
+    source $XDG_CONFIG_HOME/nvim/setting/unix.vim
 else
     let g:ostype = "unknown"
 endif
 
 "deinの処理
-source $XDG_CONFIG_HOME/nvim/dein.vim
+source $XDG_CONFIG_HOME/nvim/setting/dein.vim
 
 filetype plugin indent on
 syntax enable
