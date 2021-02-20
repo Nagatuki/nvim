@@ -1,3 +1,4 @@
-/vim_backup/
+/vim_backup/*
 /rplugin.vim
 /.netrwhist
+/dein/
