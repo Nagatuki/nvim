@@ -26,5 +26,7 @@ endif
 "deinの処理
 source $XDG_CONFIG_HOME/nvim/setting/dein.vim
 
+colorscheme molokai
+
 filetype plugin indent on
 syntax enable

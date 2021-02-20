@@ -27,6 +27,8 @@ if dein#load_state(g:dein_dir)
     call dein#add(g:dein_dir)
     call dein#add(s:dein_repo_dir)
 
+    call dein#add('tomasr/molokai')
+
     call dein#load_toml(s:toml, {'lazy' : 0})
     call dein#load_toml(s:lazy_toml, {'lazy' : 1})
 
