@@ -1,4 +1,5 @@
-/vim_backup/*
 /rplugin.vim
 /.netrwhist
 /dein/
+/vim_backup/*
+!/vim_backup/.gitignore
