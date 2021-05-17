@@ -203,7 +203,7 @@ hook_add = '''
 repo = 'neoclide/coc.nvim'
 merged = '0'
 rev = 'release'
-hool_add = '''
+hook_add = '''
     " use <tab> for trigger completion and navigate to next complete item
     inoremap <silent><expr> <TAB>
       \ <SID>check_back_space() ? "\<TAB>" :
