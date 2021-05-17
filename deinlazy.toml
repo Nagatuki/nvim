@@ -1,33 +1,5 @@
 # deinlazy.toml
 
-# deoplete-jedi
-[[plugins]]
-repo = 'zchee/deoplete-jedi'
-depends = "deoplete.nvim"
-on_event = 'InsertEnter'
-on_ft = 'python'
-
-# deoplete-clang
-[[plugins]]
-repo = "zchee/deoplete-clang"
-on_ft = ['c', 'cpp', 'cmake']
-depends = "deoplete.nvim"
-hook_source = """
-    if g:ostype=="win"
-        if expand('~/')=='C:\Users\naoki\'
-            let g:deoplete#sources#clang#libclang_path='C:\ProLang\LLVM\lib\libclang.lib'
-            let g:deoplete#sources#clang#clang_header='C:\ProLang\LLVM\lib\clang'
-        else
-            let g:deoplete#sources#clang#libclang_path='D:\Programs\LLVM\lib\libclang.lib'
-            let g:deoplete#sources#clang#clang_header='D:\Programs\LLVM\lib\clang'
-        endif
-    elseif g:ostype=="unix"
-        let g:deoplete#sources#clang#libclang_path='/usr/lib/llvm-6.0/lib/libclang.so.1'
-        let g:deoplete#snippets#clang#clang_header='/usr/lib/llvm-6.0/lib/clang/'
-    endif
-    let g:deoplete#sources#clang#std={'c': 'c11', 'cpp': 'c++1z', 'objc': 'c11', 'objcpp': 'c++1z'}
-"""
-
 # snippets
 [[plugins]]
 repo = 'Shougo/neosnippet-snippets'
