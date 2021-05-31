@@ -413,7 +413,7 @@ hook_add = """
 repo = 'scrooloose/nerdtree'
 hook_add = '''
   let NERDTreeShowHidden=1
-    nnoremap <silent><C-e> :NERDTreeFind<CR>:vertical res 30<CR>
+    nnoremap <silent><C-t> :NERDTreeFind<CR>:vertical res 30<CR>
 '''
 
 [[plugins]]
@@ -438,6 +438,7 @@ hook_add = '''
 [[plugins]]
 repo = 'simeji/winresizer'
 hook_add = '''
+    let g:winresizer_start_key = '<C-E>'
     let g:winresizer_vert_resize = 1
     let g:winresizer_horiz_resize = 1
 '''
